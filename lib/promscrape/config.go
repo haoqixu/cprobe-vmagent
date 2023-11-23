@@ -19,22 +19,7 @@ import (
 	"github.com/VictoriaMetrics/VictoriaMetrics/lib/logger"
 	"github.com/VictoriaMetrics/VictoriaMetrics/lib/promauth"
 	"github.com/VictoriaMetrics/VictoriaMetrics/lib/promrelabel"
-	"github.com/VictoriaMetrics/VictoriaMetrics/lib/promscrape/discovery/azure"
-	"github.com/VictoriaMetrics/VictoriaMetrics/lib/promscrape/discovery/consul"
-	"github.com/VictoriaMetrics/VictoriaMetrics/lib/promscrape/discovery/consulagent"
-	"github.com/VictoriaMetrics/VictoriaMetrics/lib/promscrape/discovery/digitalocean"
-	"github.com/VictoriaMetrics/VictoriaMetrics/lib/promscrape/discovery/dns"
-	"github.com/VictoriaMetrics/VictoriaMetrics/lib/promscrape/discovery/docker"
-	"github.com/VictoriaMetrics/VictoriaMetrics/lib/promscrape/discovery/dockerswarm"
-	"github.com/VictoriaMetrics/VictoriaMetrics/lib/promscrape/discovery/ec2"
-	"github.com/VictoriaMetrics/VictoriaMetrics/lib/promscrape/discovery/eureka"
-	"github.com/VictoriaMetrics/VictoriaMetrics/lib/promscrape/discovery/gce"
 	"github.com/VictoriaMetrics/VictoriaMetrics/lib/promscrape/discovery/http"
-	"github.com/VictoriaMetrics/VictoriaMetrics/lib/promscrape/discovery/kubernetes"
-	"github.com/VictoriaMetrics/VictoriaMetrics/lib/promscrape/discovery/kuma"
-	"github.com/VictoriaMetrics/VictoriaMetrics/lib/promscrape/discovery/nomad"
-	"github.com/VictoriaMetrics/VictoriaMetrics/lib/promscrape/discovery/openstack"
-	"github.com/VictoriaMetrics/VictoriaMetrics/lib/promscrape/discovery/yandexcloud"
 	"github.com/VictoriaMetrics/VictoriaMetrics/lib/promutils"
 	"github.com/VictoriaMetrics/VictoriaMetrics/lib/proxy"
 	"github.com/VictoriaMetrics/metrics"
@@ -291,24 +276,24 @@ type ScrapeConfig struct {
 	MetricRelabelConfigs []promrelabel.RelabelConfig `yaml:"metric_relabel_configs,omitempty"`
 	SampleLimit          int                         `yaml:"sample_limit,omitempty"`
 
-	AzureSDConfigs        []azure.SDConfig        `yaml:"azure_sd_configs,omitempty"`
-	ConsulSDConfigs       []consul.SDConfig       `yaml:"consul_sd_configs,omitempty"`
-	ConsulAgentSDConfigs  []consulagent.SDConfig  `yaml:"consulagent_sd_configs,omitempty"`
-	DigitaloceanSDConfigs []digitalocean.SDConfig `yaml:"digitalocean_sd_configs,omitempty"`
-	DNSSDConfigs          []dns.SDConfig          `yaml:"dns_sd_configs,omitempty"`
-	DockerSDConfigs       []docker.SDConfig       `yaml:"docker_sd_configs,omitempty"`
-	DockerSwarmSDConfigs  []dockerswarm.SDConfig  `yaml:"dockerswarm_sd_configs,omitempty"`
-	EC2SDConfigs          []ec2.SDConfig          `yaml:"ec2_sd_configs,omitempty"`
-	EurekaSDConfigs       []eureka.SDConfig       `yaml:"eureka_sd_configs,omitempty"`
-	FileSDConfigs         []FileSDConfig          `yaml:"file_sd_configs,omitempty"`
-	GCESDConfigs          []gce.SDConfig          `yaml:"gce_sd_configs,omitempty"`
-	HTTPSDConfigs         []http.SDConfig         `yaml:"http_sd_configs,omitempty"`
-	KubernetesSDConfigs   []kubernetes.SDConfig   `yaml:"kubernetes_sd_configs,omitempty"`
-	KumaSDConfigs         []kuma.SDConfig         `yaml:"kuma_sd_configs,omitempty"`
-	NomadSDConfigs        []nomad.SDConfig        `yaml:"nomad_sd_configs,omitempty"`
-	OpenStackSDConfigs    []openstack.SDConfig    `yaml:"openstack_sd_configs,omitempty"`
-	StaticConfigs         []StaticConfig          `yaml:"static_configs,omitempty"`
-	YandexCloudSDConfigs  []yandexcloud.SDConfig  `yaml:"yandexcloud_sd_configs,omitempty"`
+	// AzureSDConfigs        []azure.SDConfig        `yaml:"azure_sd_configs,omitempty"`
+	// ConsulSDConfigs       []consul.SDConfig       `yaml:"consul_sd_configs,omitempty"`
+	// ConsulAgentSDConfigs  []consulagent.SDConfig  `yaml:"consulagent_sd_configs,omitempty"`
+	// DigitaloceanSDConfigs []digitalocean.SDConfig `yaml:"digitalocean_sd_configs,omitempty"`
+	// DNSSDConfigs          []dns.SDConfig          `yaml:"dns_sd_configs,omitempty"`
+	// DockerSDConfigs       []docker.SDConfig       `yaml:"docker_sd_configs,omitempty"`
+	// DockerSwarmSDConfigs  []dockerswarm.SDConfig  `yaml:"dockerswarm_sd_configs,omitempty"`
+	// EC2SDConfigs          []ec2.SDConfig          `yaml:"ec2_sd_configs,omitempty"`
+	// EurekaSDConfigs       []eureka.SDConfig       `yaml:"eureka_sd_configs,omitempty"`
+	FileSDConfigs []FileSDConfig `yaml:"file_sd_configs,omitempty"`
+	// GCESDConfigs          []gce.SDConfig          `yaml:"gce_sd_configs,omitempty"`
+	HTTPSDConfigs []http.SDConfig `yaml:"http_sd_configs,omitempty"`
+	// KubernetesSDConfigs   []kubernetes.SDConfig   `yaml:"kubernetes_sd_configs,omitempty"`
+	// KumaSDConfigs         []kuma.SDConfig         `yaml:"kuma_sd_configs,omitempty"`
+	// NomadSDConfigs        []nomad.SDConfig        `yaml:"nomad_sd_configs,omitempty"`
+	// OpenStackSDConfigs    []openstack.SDConfig    `yaml:"openstack_sd_configs,omitempty"`
+	StaticConfigs []StaticConfig `yaml:"static_configs,omitempty"`
+	// YandexCloudSDConfigs  []yandexcloud.SDConfig  `yaml:"yandexcloud_sd_configs,omitempty"`
 
 	// These options are supported only by lib/promscrape.
 	DisableCompression  bool                       `yaml:"disable_compression,omitempty"`
@@ -325,66 +310,66 @@ type ScrapeConfig struct {
 }
 
 func (sc *ScrapeConfig) mustStart(baseDir string) {
-	swosFunc := func(metaLabels *promutils.Labels) interface{} {
-		target := metaLabels.Get("__address__")
-		sw, err := sc.swc.getScrapeWork(target, nil, metaLabels)
-		if err != nil {
-			logger.Errorf("cannot create kubernetes_sd_config target %q for job_name=%s: %s", target, sc.swc.jobName, err)
-			return nil
-		}
-		return sw
-	}
-	for i := range sc.KubernetesSDConfigs {
-		sc.KubernetesSDConfigs[i].MustStart(baseDir, swosFunc)
-	}
+	//swosFunc := func(metaLabels *promutils.Labels) interface{} {
+	//	target := metaLabels.Get("__address__")
+	//	sw, err := sc.swc.getScrapeWork(target, nil, metaLabels)
+	//	if err != nil {
+	//		logger.Errorf("cannot create kubernetes_sd_config target %q for job_name=%s: %s", target, sc.swc.jobName, err)
+	//		return nil
+	//	}
+	//	return sw
+	//}
+	//for i := range sc.KubernetesSDConfigs {
+	//	sc.KubernetesSDConfigs[i].MustStart(baseDir, swosFunc)
+	//}
 }
 
 func (sc *ScrapeConfig) mustStop() {
-	for i := range sc.AzureSDConfigs {
-		sc.AzureSDConfigs[i].MustStop()
-	}
-	for i := range sc.ConsulSDConfigs {
-		sc.ConsulSDConfigs[i].MustStop()
-	}
-	for i := range sc.ConsulAgentSDConfigs {
-		sc.ConsulAgentSDConfigs[i].MustStop()
-	}
-	for i := range sc.DigitaloceanSDConfigs {
-		sc.DigitaloceanSDConfigs[i].MustStop()
-	}
-	for i := range sc.DNSSDConfigs {
-		sc.DNSSDConfigs[i].MustStop()
-	}
-	for i := range sc.DockerSDConfigs {
-		sc.DockerSDConfigs[i].MustStop()
-	}
-	for i := range sc.DockerSwarmSDConfigs {
-		sc.DockerSwarmSDConfigs[i].MustStop()
-	}
-	for i := range sc.EC2SDConfigs {
-		sc.EC2SDConfigs[i].MustStop()
-	}
-	for i := range sc.EurekaSDConfigs {
-		sc.EurekaSDConfigs[i].MustStop()
-	}
-	for i := range sc.GCESDConfigs {
-		sc.GCESDConfigs[i].MustStop()
-	}
+	// for i := range sc.AzureSDConfigs {
+	// 	sc.AzureSDConfigs[i].MustStop()
+	// }
+	// for i := range sc.ConsulSDConfigs {
+	// 	sc.ConsulSDConfigs[i].MustStop()
+	// }
+	// for i := range sc.ConsulAgentSDConfigs {
+	// 	sc.ConsulAgentSDConfigs[i].MustStop()
+	// }
+	// for i := range sc.DigitaloceanSDConfigs {
+	// 	sc.DigitaloceanSDConfigs[i].MustStop()
+	// }
+	// for i := range sc.DNSSDConfigs {
+	// 	sc.DNSSDConfigs[i].MustStop()
+	// }
+	// for i := range sc.DockerSDConfigs {
+	// 	sc.DockerSDConfigs[i].MustStop()
+	// }
+	// for i := range sc.DockerSwarmSDConfigs {
+	// 	sc.DockerSwarmSDConfigs[i].MustStop()
+	// }
+	// for i := range sc.EC2SDConfigs {
+	// 	sc.EC2SDConfigs[i].MustStop()
+	// }
+	// for i := range sc.EurekaSDConfigs {
+	// 	sc.EurekaSDConfigs[i].MustStop()
+	// }
+	// for i := range sc.GCESDConfigs {
+	// 	sc.GCESDConfigs[i].MustStop()
+	// }
 	for i := range sc.HTTPSDConfigs {
 		sc.HTTPSDConfigs[i].MustStop()
 	}
-	for i := range sc.KubernetesSDConfigs {
-		sc.KubernetesSDConfigs[i].MustStop()
-	}
-	for i := range sc.KumaSDConfigs {
-		sc.KumaSDConfigs[i].MustStop()
-	}
-	for i := range sc.NomadSDConfigs {
-		sc.NomadSDConfigs[i].MustStop()
-	}
-	for i := range sc.OpenStackSDConfigs {
-		sc.OpenStackSDConfigs[i].MustStop()
-	}
+	// for i := range sc.KubernetesSDConfigs {
+	// 	sc.KubernetesSDConfigs[i].MustStop()
+	// }
+	// for i := range sc.KumaSDConfigs {
+	// 	sc.KumaSDConfigs[i].MustStop()
+	// }
+	// for i := range sc.NomadSDConfigs {
+	// 	sc.NomadSDConfigs[i].MustStop()
+	// }
+	// for i := range sc.OpenStackSDConfigs {
+	// 	sc.OpenStackSDConfigs[i].MustStop()
+	// }
 }
 
 // FileSDConfig represents file-based service discovery config.
@@ -543,94 +528,94 @@ func getSWSByJob(sws []*ScrapeWork) map[string][]*ScrapeWork {
 }
 
 // getAzureSDScrapeWork returns `azure_sd_configs` ScrapeWork from cfg.
-func (cfg *Config) getAzureSDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
-	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
-		for i := range sc.AzureSDConfigs {
-			visitor(&sc.AzureSDConfigs[i])
-		}
-	}
-	return cfg.getScrapeWorkGeneric(visitConfigs, "azure_sd_config", prev)
-}
+// func (cfg *Config) getAzureSDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
+// 	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
+// 		for i := range sc.AzureSDConfigs {
+// 			visitor(&sc.AzureSDConfigs[i])
+// 		}
+// 	}
+// 	return cfg.getScrapeWorkGeneric(visitConfigs, "azure_sd_config", prev)
+// }
 
 // getConsulSDScrapeWork returns `consul_sd_configs` ScrapeWork from cfg.
-func (cfg *Config) getConsulSDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
-	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
-		for i := range sc.ConsulSDConfigs {
-			visitor(&sc.ConsulSDConfigs[i])
-		}
-	}
-	return cfg.getScrapeWorkGeneric(visitConfigs, "consul_sd_config", prev)
-}
+// func (cfg *Config) getConsulSDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
+// 	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
+// 		for i := range sc.ConsulSDConfigs {
+// 			visitor(&sc.ConsulSDConfigs[i])
+// 		}
+// 	}
+// 	return cfg.getScrapeWorkGeneric(visitConfigs, "consul_sd_config", prev)
+// }
 
 // getConsulAgentSDScrapeWork returns `consulagent_sd_configs` ScrapeWork from cfg.
-func (cfg *Config) getConsulAgentSDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
-	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
-		for i := range sc.ConsulAgentSDConfigs {
-			visitor(&sc.ConsulAgentSDConfigs[i])
-		}
-	}
-	return cfg.getScrapeWorkGeneric(visitConfigs, "consulagent_sd_config", prev)
-}
+// func (cfg *Config) getConsulAgentSDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
+// 	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
+// 		for i := range sc.ConsulAgentSDConfigs {
+// 			visitor(&sc.ConsulAgentSDConfigs[i])
+// 		}
+// 	}
+// 	return cfg.getScrapeWorkGeneric(visitConfigs, "consulagent_sd_config", prev)
+// }
 
 // getDigitalOceanDScrapeWork returns `digitalocean_sd_configs` ScrapeWork from cfg.
-func (cfg *Config) getDigitalOceanDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
-	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
-		for i := range sc.DigitaloceanSDConfigs {
-			visitor(&sc.DigitaloceanSDConfigs[i])
-		}
-	}
-	return cfg.getScrapeWorkGeneric(visitConfigs, "digitalocean_sd_config", prev)
-}
+// func (cfg *Config) getDigitalOceanDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
+// 	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
+// 		for i := range sc.DigitaloceanSDConfigs {
+// 			visitor(&sc.DigitaloceanSDConfigs[i])
+// 		}
+// 	}
+// 	return cfg.getScrapeWorkGeneric(visitConfigs, "digitalocean_sd_config", prev)
+// }
 
 // getDNSSDScrapeWork returns `dns_sd_configs` ScrapeWork from cfg.
-func (cfg *Config) getDNSSDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
-	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
-		for i := range sc.DNSSDConfigs {
-			visitor(&sc.DNSSDConfigs[i])
-		}
-	}
-	return cfg.getScrapeWorkGeneric(visitConfigs, "dns_sd_config", prev)
-}
+// func (cfg *Config) getDNSSDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
+// 	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
+// 		for i := range sc.DNSSDConfigs {
+// 			visitor(&sc.DNSSDConfigs[i])
+// 		}
+// 	}
+// 	return cfg.getScrapeWorkGeneric(visitConfigs, "dns_sd_config", prev)
+// }
 
 // getDockerSDScrapeWork returns `docker_sd_configs` ScrapeWork from cfg.
-func (cfg *Config) getDockerSDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
-	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
-		for i := range sc.DockerSDConfigs {
-			visitor(&sc.DockerSDConfigs[i])
-		}
-	}
-	return cfg.getScrapeWorkGeneric(visitConfigs, "docker_sd_config", prev)
-}
+// func (cfg *Config) getDockerSDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
+// 	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
+// 		for i := range sc.DockerSDConfigs {
+// 			visitor(&sc.DockerSDConfigs[i])
+// 		}
+// 	}
+// 	return cfg.getScrapeWorkGeneric(visitConfigs, "docker_sd_config", prev)
+// }
 
 // getDockerSwarmSDScrapeWork returns `dockerswarm_sd_configs` ScrapeWork from cfg.
-func (cfg *Config) getDockerSwarmSDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
-	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
-		for i := range sc.DockerSwarmSDConfigs {
-			visitor(&sc.DockerSwarmSDConfigs[i])
-		}
-	}
-	return cfg.getScrapeWorkGeneric(visitConfigs, "dockerswarm_sd_config", prev)
-}
+// func (cfg *Config) getDockerSwarmSDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
+// 	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
+// 		for i := range sc.DockerSwarmSDConfigs {
+// 			visitor(&sc.DockerSwarmSDConfigs[i])
+// 		}
+// 	}
+// 	return cfg.getScrapeWorkGeneric(visitConfigs, "dockerswarm_sd_config", prev)
+// }
 
 // getEC2SDScrapeWork returns `ec2_sd_configs` ScrapeWork from cfg.
-func (cfg *Config) getEC2SDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
-	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
-		for i := range sc.EC2SDConfigs {
-			visitor(&sc.EC2SDConfigs[i])
-		}
-	}
-	return cfg.getScrapeWorkGeneric(visitConfigs, "ec2_sd_config", prev)
-}
+// func (cfg *Config) getEC2SDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
+// 	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
+// 		for i := range sc.EC2SDConfigs {
+// 			visitor(&sc.EC2SDConfigs[i])
+// 		}
+// 	}
+// 	return cfg.getScrapeWorkGeneric(visitConfigs, "ec2_sd_config", prev)
+// }
 
 // getEurekaSDScrapeWork returns `eureka_sd_configs` ScrapeWork from cfg.
-func (cfg *Config) getEurekaSDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
-	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
-		for i := range sc.EurekaSDConfigs {
-			visitor(&sc.EurekaSDConfigs[i])
-		}
-	}
-	return cfg.getScrapeWorkGeneric(visitConfigs, "eureka_sd_config", prev)
-}
+// func (cfg *Config) getEurekaSDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
+// 	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
+// 		for i := range sc.EurekaSDConfigs {
+// 			visitor(&sc.EurekaSDConfigs[i])
+// 		}
+// 	}
+// 	return cfg.getScrapeWorkGeneric(visitConfigs, "eureka_sd_config", prev)
+// }
 
 // getFileSDScrapeWork returns `file_sd_configs` ScrapeWork from cfg.
 func (cfg *Config) getFileSDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
@@ -645,14 +630,14 @@ func (cfg *Config) getFileSDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
 }
 
 // getGCESDScrapeWork returns `gce_sd_configs` ScrapeWork from cfg.
-func (cfg *Config) getGCESDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
-	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
-		for i := range sc.GCESDConfigs {
-			visitor(&sc.GCESDConfigs[i])
-		}
-	}
-	return cfg.getScrapeWorkGeneric(visitConfigs, "gce_sd_config", prev)
-}
+// func (cfg *Config) getGCESDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
+// 	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
+// 		for i := range sc.GCESDConfigs {
+// 			visitor(&sc.GCESDConfigs[i])
+// 		}
+// 	}
+// 	return cfg.getScrapeWorkGeneric(visitConfigs, "gce_sd_config", prev)
+// }
 
 // getHTTPDScrapeWork returns `http_sd_configs` ScrapeWork from cfg.
 func (cfg *Config) getHTTPDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
@@ -665,72 +650,72 @@ func (cfg *Config) getHTTPDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
 }
 
 // getKubernetesSDScrapeWork returns `kubernetes_sd_configs` ScrapeWork from cfg.
-func (cfg *Config) getKubernetesSDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
-	const discoveryType = "kubernetes_sd_config"
-	swsPrevByJob := getSWSByJob(prev)
-	dst := make([]*ScrapeWork, 0, len(prev))
-	for _, sc := range cfg.ScrapeConfigs {
-		dstLen := len(dst)
-		ok := true
-		for j := range sc.KubernetesSDConfigs {
-			sdc := &sc.KubernetesSDConfigs[j]
-			swos, err := sdc.GetScrapeWorkObjects()
-			if err != nil {
-				logger.Errorf("skipping %s targets for job_name=%s because of error: %s", discoveryType, sc.swc.jobName, err)
-				ok = false
-				break
-			}
-			for _, swo := range swos {
-				sw := swo.(*ScrapeWork)
-				dst = append(dst, sw)
-			}
-		}
-		if !ok {
-			dst = sc.appendPrevTargets(dst[:dstLen], swsPrevByJob, discoveryType)
-		}
-	}
-	return dst
-}
+// func (cfg *Config) getKubernetesSDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
+// 	const discoveryType = "kubernetes_sd_config"
+// 	swsPrevByJob := getSWSByJob(prev)
+// 	dst := make([]*ScrapeWork, 0, len(prev))
+// 	for _, sc := range cfg.ScrapeConfigs {
+// 		dstLen := len(dst)
+// 		ok := true
+// 		for j := range sc.KubernetesSDConfigs {
+//			sdc := &sc.KubernetesSDConfigs[j]
+//			swos, err := sdc.GetScrapeWorkObjects()
+//			if err != nil {
+//				logger.Errorf("skipping %s targets for job_name=%s because of error: %s", discoveryType, sc.swc.jobName, err)
+//				ok = false
+//				break
+//			}
+//			for _, swo := range swos {
+//				sw := swo.(*ScrapeWork)
+//				dst = append(dst, sw)
+//			}
+//		}
+//		if !ok {
+//			dst = sc.appendPrevTargets(dst[:dstLen], swsPrevByJob, discoveryType)
+//		}
+//	}
+//	return dst
+//}
 
 // getKumaSDScrapeWork returns `kuma_sd_configs` ScrapeWork from cfg.
-func (cfg *Config) getKumaSDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
-	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
-		for i := range sc.KumaSDConfigs {
-			visitor(&sc.KumaSDConfigs[i])
-		}
-	}
-	return cfg.getScrapeWorkGeneric(visitConfigs, "kuma_sd_config", prev)
-}
+//func (cfg *Config) getKumaSDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
+//	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
+//		for i := range sc.KumaSDConfigs {
+//			visitor(&sc.KumaSDConfigs[i])
+//		}
+//	}
+//	return cfg.getScrapeWorkGeneric(visitConfigs, "kuma_sd_config", prev)
+//}
 
 // getNomadSDScrapeWork returns `nomad_sd_configs` ScrapeWork from cfg.
-func (cfg *Config) getNomadSDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
-	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
-		for i := range sc.NomadSDConfigs {
-			visitor(&sc.NomadSDConfigs[i])
-		}
-	}
-	return cfg.getScrapeWorkGeneric(visitConfigs, "nomad_sd_config", prev)
-}
+//func (cfg *Config) getNomadSDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
+//	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
+//		for i := range sc.NomadSDConfigs {
+//			visitor(&sc.NomadSDConfigs[i])
+//		}
+//	}
+//	return cfg.getScrapeWorkGeneric(visitConfigs, "nomad_sd_config", prev)
+//}
 
 // getOpenStackSDScrapeWork returns `openstack_sd_configs` ScrapeWork from cfg.
-func (cfg *Config) getOpenStackSDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
-	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
-		for i := range sc.OpenStackSDConfigs {
-			visitor(&sc.OpenStackSDConfigs[i])
-		}
-	}
-	return cfg.getScrapeWorkGeneric(visitConfigs, "openstack_sd_config", prev)
-}
+//func (cfg *Config) getOpenStackSDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
+//	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
+//		for i := range sc.OpenStackSDConfigs {
+//			visitor(&sc.OpenStackSDConfigs[i])
+//		}
+//	}
+//	return cfg.getScrapeWorkGeneric(visitConfigs, "openstack_sd_config", prev)
+//}
 
 // getYandexCloudSDScrapeWork returns `yandexcloud_sd_configs` ScrapeWork from cfg.
-func (cfg *Config) getYandexCloudSDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
-	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
-		for i := range sc.YandexCloudSDConfigs {
-			visitor(&sc.YandexCloudSDConfigs[i])
-		}
-	}
-	return cfg.getScrapeWorkGeneric(visitConfigs, "yandexcloud_sd_config", prev)
-}
+//func (cfg *Config) getYandexCloudSDScrapeWork(prev []*ScrapeWork) []*ScrapeWork {
+//	visitConfigs := func(sc *ScrapeConfig, visitor func(sdc targetLabelsGetter)) {
+//		for i := range sc.YandexCloudSDConfigs {
+//			visitor(&sc.YandexCloudSDConfigs[i])
+//		}
+//	}
+//	return cfg.getScrapeWorkGeneric(visitConfigs, "yandexcloud_sd_config", prev)
+//}
 
 type targetLabelsGetter interface {
 	GetLabels(baseDir string) ([]*promutils.Labels, error)
